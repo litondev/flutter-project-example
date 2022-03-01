@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:convert';
 import 'dart:math' as math;
+import '../components/spinner.dart';
 
 class Signin extends StatelessWidget{
   Widget build(BuildContext context){
@@ -17,14 +19,30 @@ class Signin extends StatelessWidget{
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(                      
-                child: Image(
-                  image: AssetImage('images/signin.svg'),
+                child: 
+                 SvgPicture.asset(
+                  'images/signin.svg',
                   alignment: Alignment.center,
                   width: double.infinity,
-                  height: 80,
+                  height: 200,
                 )
               ),            
-              SigninScreen()
+              SigninScreen(context),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children : [                
+                  TextButton(
+                      onPressed: (){
+                        Navigator.pushNamed(context,"/signup");
+                      },
+                      child : Text("Daftar",
+                      style : TextStyle(
+                        color: Colors.blueAccent
+                      )
+                    )
+                  )
+                ]
+              )
             ]
           )
         )
@@ -34,11 +52,19 @@ class Signin extends StatelessWidget{
 }
 
 class SigninScreen extends StatefulWidget{
+  final BuildContext parentContext;
+
+  SigninScreen(this.parentContext);
+
   @override 
-  SigninScreenState createState() => SigninScreenState();
+  SigninScreenState createState() => SigninScreenState(this.parentContext);
 }
 
 class SigninScreenState extends State<SigninScreen>{
+  final BuildContext parentContext;
+
+  SigninScreenState(this.parentContext);
+
   final formKey = GlobalKey<FormState>();
 
   String email = '';
@@ -59,7 +85,7 @@ class SigninScreenState extends State<SigninScreen>{
               children : [
                 TextButton(
                   onPressed: (){
-                    Navigator.of(context).pushReplacementNamed("/forgot_password");
+                    Navigator.of(parentContext).pushReplacementNamed("/forgot_password");
                   },
                   child: Text("Lupa Password",
                     style : TextStyle(
@@ -69,22 +95,10 @@ class SigninScreenState extends State<SigninScreen>{
                 )
               ]
             ),
-            SigninButton(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children : [                
-                TextButton(
-                    onPressed: (){
-                      Navigator.of(context).pushReplacementNamed("/signup");
-                    },
-                    child : Text("Daftar",
-                    style : TextStyle(
-                      color: Colors.blueAccent
-                    )
-                  )
-                )
-              ]
-            )
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [SigninButton()]
+            ),            
           ],
         ),
       )
@@ -131,20 +145,24 @@ class SigninScreenState extends State<SigninScreen>{
   Widget SigninButton(){
     return ElevatedButton(
       style : ElevatedButton.styleFrom(
-          primary: Colors.greenAccent,
-          onPrimary: Colors.greenAccent,
-          fixedSize : Size(150,50)
+          primary: (isLoadingForm == true ? Colors.green[600] : Colors.green[700]),
+          onPrimary: Colors.white,          
+          textStyle: TextStyle(
+            fontSize: 16
+          ),
+          fixedSize : Size(130,40)
       ),
       child: Center(
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            isLoadingForm 
-            ? Transform.rotate(
-                angle: 180 * math.pi / 180,
-                child: Icon( Icons.rotate_left )
-              ) 
+            isLoadingForm == true
+            ? Spinner( icon: Icons.rotate_right )        
             : Icon( Icons.save),
-            Text("Save")
+            Padding(
+              padding: EdgeInsets.only(left : 5),
+              child : Text("Kirim")
+            )
           ],
         )
       ),
@@ -183,11 +201,11 @@ class SigninScreenState extends State<SigninScreen>{
       Fluttertoast.showToast(
           msg: "Something Wrong",
           toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.TOP_RIGHT,
+          gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.red,
           textColor: Colors.white,
-          fontSize: 16.0
+          fontSize: 16.0,         
       );
     }finally{
       setState(() {    

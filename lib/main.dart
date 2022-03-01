@@ -19,14 +19,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context){
     return MaterialApp(
       routes: {
-        '/' : (ctx) => Signin(),
-        '/signup' : (ctx) => Signup(),
-        '/forgot_password' : (ctx) => ForgotPassword(),
-        '/reset_password' : (ctx) => ResetPassword(),
+        '/' : (context) => Signin(),
+        '/signup' : (context) => Signup(),
+        '/forgot_password' : (context) => ForgotPassword(),
+        '/reset_password' : (context) => ResetPassword(),
 
-        '/dashboard' : (ctx) => Dashboard(),
-        '/product' : (ctx) => Product(),
-        '/profil' : (ctx) => Profil()
+        '/dashboard' : (context) => Dashboard(),
+        '/product' : (context) => Product(),
+        '/profil' : (context) => Profil()
       },
     );
   }
