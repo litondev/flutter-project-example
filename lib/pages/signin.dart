@@ -184,7 +184,7 @@ class SigninScreenState extends State<SigninScreen>{
     
     try{    
         var response = await http.post(
-          Uri.parse(dotenv.env['API_URL']! + "/product"),
+          Uri.parse(dotenv.env['API_URL']! + "/signin"),
           headers : {
              "Content-Type": "application/json"
           },
