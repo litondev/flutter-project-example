@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:convert';
 import 'dart:math' as math;
 import '../components/spinner.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Signin extends StatelessWidget{
   Widget build(BuildContext context){
@@ -200,8 +201,7 @@ class SigninScreenState extends State<SigninScreen>{
           })
         );    
 
-
-         if(response.statusCode == 404){
+        if(response.statusCode == 404){
           Fluttertoast.showToast(
             msg: "Url tidak ditemukan",
             toastLength: Toast.LENGTH_LONG,
@@ -239,16 +239,13 @@ class SigninScreenState extends State<SigninScreen>{
           var responseBody = json.decode(response.body);
 
           print(responseBody);
+
+          final prefs = await SharedPreferences.getInstance();
+
+          await prefs.setString('token', 'Bearer '+responseBody["access_token"]);
+          await prefs.setString('user',json.encode(responseBody["user"]));
           
-          Fluttertoast.showToast(
-            msg: "Berhasil login",
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0,         
-          );
+          Navigator.of(parentContext).pushReplacementNamed("/dashboard");
         }else{
           print(response.statusCode);
           

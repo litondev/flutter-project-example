@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import "./pages/signin.dart";
 import "./pages/signup.dart";
@@ -12,11 +13,21 @@ import "./pages/profil.dart";
 void main() async {
   await dotenv.load(fileName: ".env");
 
-  runApp(MyApp());
+  final prefs = await SharedPreferences.getInstance();
+
+  bool isLogin = prefs.getString('token') != null 
+    ? true
+    : false;
+
+  runApp(MyApp(isLogin));
 }
 
 class MyApp extends StatelessWidget {
-  Widget build(BuildContext context){
+  bool isLogin;
+
+  MyApp(this.isLogin);
+
+  Widget build(BuildContext context){    
     return MaterialApp(
       routes: {
         '/' : (context) => Signin(),
