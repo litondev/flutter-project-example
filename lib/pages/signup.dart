@@ -32,7 +32,7 @@ class Signup extends StatelessWidget{
                 children : [                
                   TextButton(
                       onPressed: (){
-                        Navigator.pushNamed(context,"/signin");
+                        Navigator.of(context).pushReplacementNamed("/");
                       },
                       child : Text("Masuk",
                       style : TextStyle(
@@ -75,7 +75,9 @@ class SignupScreenState extends State<SignupScreen>{
             PasswordField(),          
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: [SignupButton()]
+              children: <Widget>[
+                SignupButton()
+              ]
             ),            
           ],
         ),
@@ -96,6 +98,9 @@ class SignupScreenState extends State<SignupScreen>{
 
         return null;
       },
+      onSaved: (String? value) { 
+        name = value.toString();
+      },
     );
   }
 
@@ -112,6 +117,9 @@ class SignupScreenState extends State<SignupScreen>{
 
         return null;
       },
+      onSaved: (String? value) { 
+        email = value.toString();
+      },
     );
   }
 
@@ -123,15 +131,18 @@ class SignupScreenState extends State<SignupScreen>{
         // hintText: "*Masukan password"
       ),
       validator: (value){
-        if(value!.isEmpty){
-          return "Password tidak boleh kosong";
-        }
+        // if(value!.isEmpty){
+        //   return "Password tidak boleh kosong";
+        // }
 
-        if(value.length <= 7){
-          return "Password tidak boleh kurang dari 8";
-        }
+        // if(value.length <= 7){
+        //   return "Password tidak boleh kurang dari 8";
+        // }
 
         return null;
+      },
+      onSaved: (String? value) { 
+        password = value.toString();
       },
     );
   }
@@ -139,7 +150,9 @@ class SignupScreenState extends State<SignupScreen>{
   Widget SignupButton(){
     return ElevatedButton(
       style : ElevatedButton.styleFrom(
-          primary: (isLoadingForm == true ? Colors.green[600] : Colors.green[700]),
+          primary: isLoadingForm == true 
+            ? Colors.green[600] 
+            : Colors.green[700],
           onPrimary: Colors.white,          
           textStyle: TextStyle(
             fontSize: 16
@@ -151,7 +164,9 @@ class SignupScreenState extends State<SignupScreen>{
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             isLoadingForm == true
-            ? Spinner( icon: Icons.rotate_right )        
+            ? Spinner( 
+                icon: Icons.rotate_right 
+              )        
             : Icon( Icons.save),
             Padding(
               padding: EdgeInsets.only(left : 5),
@@ -189,7 +204,62 @@ class SignupScreenState extends State<SignupScreen>{
           })
         );    
 
-        print(json.decode(response.body));
+
+        if(response.statusCode == 400){
+          Fluttertoast.showToast(
+            msg: "Url tidak ditemukan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 422){
+          var message = json.decode(response.body);
+
+          Fluttertoast.showToast(
+            msg: message["message"],
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 500){
+          var message = json.decode(response.body);
+
+          Fluttertoast.showToast(
+            msg: message["message"] ?? "Terjadi Kesalahan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 200){
+          Fluttertoast.showToast(
+            msg: "Berhasil membuat user",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else{
+          Fluttertoast.showToast(
+            msg: "Terjadi Kesalahan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }
     }catch(e){
       print(e);
 

@@ -33,7 +33,7 @@ class Signin extends StatelessWidget{
                 children : [                
                   TextButton(
                       onPressed: (){
-                        Navigator.pushNamed(context,"/signup");
+                        Navigator.of(context).pushReplacementNamed("/signup");
                       },
                       child : Text("Daftar",
                       style : TextStyle(
@@ -118,6 +118,9 @@ class SigninScreenState extends State<SigninScreen>{
 
         return null;
       },
+      onSaved: (String? value) { 
+        email = value.toString();
+      },
     );
   }
 
@@ -138,6 +141,9 @@ class SigninScreenState extends State<SigninScreen>{
         }
 
         return null;
+      },
+      onSaved: (String? value) { 
+        password = value.toString();
       },
     );
   }
@@ -194,7 +200,66 @@ class SigninScreenState extends State<SigninScreen>{
           })
         );    
 
-        print(json.decode(response.body));
+
+        if(response.statusCode == 400){
+          Fluttertoast.showToast(
+            msg: "Url tidak ditemukan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 422){
+          var message = json.decode(response.body);
+
+          Fluttertoast.showToast(
+            msg: message["message"],
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 500){
+          var message = json.decode(response.body);
+
+          Fluttertoast.showToast(
+            msg: message["message"] ?? "Terjadi Kesalahan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 200){
+          var responseBody = json.decode(response.body);
+
+          print(responseBody);
+          
+          Fluttertoast.showToast(
+            msg: "Berhasil login",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else{
+          Fluttertoast.showToast(
+            msg: "Terjadi Kesalahan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }
     }catch(e){
       print(e);
 
