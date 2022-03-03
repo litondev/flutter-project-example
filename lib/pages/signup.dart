@@ -2,24 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
+
 import '../components/spinner.dart';
 
+import '../providers/user.dart';
+
 class Signup extends StatelessWidget{
+  Signup(BuildContext context){
+    final isLogin = Provider.of<User>(context).getIsLogin();
+    
+    if(isLogin == true){
+      Navigator.of(context).pushReplacementNamed("/dashboard");
+    }
+  }
+
   Widget build(BuildContext context){
     return MaterialApp(
       home : Scaffold(      
         backgroundColor : Colors.white,
         body : Padding(
-          padding : EdgeInsets.only(left : 20,right : 20),
+          padding : EdgeInsets.only(
+            left : 20,
+            right : 20
+          ),
           child : Column(    
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(                      
                 child: 
-                 SvgPicture.asset(
+                 Image.asset(
                   'images/signup.svg',
                   alignment: Alignment.center,
                   width: double.infinity,
@@ -131,13 +145,13 @@ class SignupScreenState extends State<SignupScreen>{
         // hintText: "*Masukan password"
       ),
       validator: (value){
-        // if(value!.isEmpty){
-        //   return "Password tidak boleh kosong";
-        // }
+        if(value!.isEmpty){
+          return "Password tidak boleh kosong";
+        }
 
-        // if(value.length <= 7){
-        //   return "Password tidak boleh kurang dari 8";
-        // }
+        if(value.length <= 7){
+          return "Password tidak boleh kurang dari 8";
+        }
 
         return null;
       },
@@ -204,8 +218,7 @@ class SignupScreenState extends State<SignupScreen>{
           })
         );    
 
-
-         if(response.statusCode == 404){
+        if(response.statusCode == 404){
           Fluttertoast.showToast(
             msg: "Url tidak ditemukan",
             toastLength: Toast.LENGTH_LONG,
@@ -266,7 +279,7 @@ class SignupScreenState extends State<SignupScreen>{
       print(e);
 
       Fluttertoast.showToast(
-          msg: "Something Wrong",
+          msg: "Terjadi Kesalahan",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,

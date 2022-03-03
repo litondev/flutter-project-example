@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 import "./pages/signin.dart";
 import "./pages/signup.dart";
@@ -10,12 +11,14 @@ import "./pages/dashboard.dart";
 import "./pages/product.dart";
 import "./pages/profil.dart";
 
+import './providers/user.dart';
+
 void main() async {
   await dotenv.load(fileName: ".env");
 
   final prefs = await SharedPreferences.getInstance();
 
-  bool isLogin = prefs.getString('token') != null 
+  final isLogin = prefs.getString('token') != null 
     ? true
     : false;
 
@@ -23,22 +26,29 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  bool isLogin;
+  final isLogin;
 
   MyApp(this.isLogin);
 
   Widget build(BuildContext context){    
-    return MaterialApp(
-      routes: {
-        '/' : (context) => Signin(),
-        '/signup' : (context) => Signup(),
-        '/forgot_password' : (context) => ForgotPassword(),
-        '/reset_password' : (context) => ResetPassword(),
+    return MultiProvider(
+      providers : [
+        ChangeNotifierProvider(
+          create: (context) => User(isLogin)
+        )      
+      ],
+      child : MaterialApp(
+        routes: {
+          '/' : (context) => Signin(context),
+          '/signup' : (context) => Signup(context),
+          '/forgot_password' : (context) => ForgotPassword(context),
+          '/reset_password' : (context) => ResetPassword(context),
 
-        '/dashboard' : (context) => Dashboard(),
-        '/product' : (context) => Product(),
-        '/profil' : (context) => Profil()
-      },
+          '/dashboard' : (context) => Dashboard(context),
+          '/product' : (context) => Product(context),
+          '/profil' : (context) => Profil(context)
+        },
+      )    
     );
   }
 } 

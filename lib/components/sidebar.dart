@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user.dart';
 
 class Sidebar extends StatelessWidget{
   @override 
@@ -59,7 +62,9 @@ class Sidebar extends StatelessWidget{
 
     await prefs.remove('token');
 
-    await prefs.remove("user");
+    // await prefs.remove("user");
+
+    Provider.of<User>(context).setIsLogin(false);
 
     Navigator.of(context).pushReplacementNamed("/");            
   }

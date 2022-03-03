@@ -2,27 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:convert';
-import 'dart:math' as math;
-import '../components/spinner.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'dart:convert';
+
+import '../components/spinner.dart';
+
+import '../providers/user.dart';
+
 class Signin extends StatelessWidget{
+  Signin(BuildContext context){
+    final isLogin = Provider.of<User>(context).getIsLogin();
+
+    if(isLogin){
+      Navigator.of(context).pushReplacementNamed("/dashboard");
+    }
+  }
+
   Widget build(BuildContext context){
     return MaterialApp(
       home : Scaffold(      
         backgroundColor : Colors.white,
         body : Padding(
-          padding : EdgeInsets.only(left : 20,right : 20),
+          padding : EdgeInsets.only(
+            left : 20,
+            right : 20
+          ),
           child : Column(    
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(                      
-                child: 
-                 SvgPicture.asset(
-                  'images/signin.svg',
+                child: Image.asset(
+                  'images/signin.png',
                   alignment: Alignment.center,
                   width: double.infinity,
                   height: 200,
@@ -98,7 +111,9 @@ class SigninScreenState extends State<SigninScreen>{
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: [SigninButton()]
+              children: <Widget>[
+                SigninButton()
+              ]
             ),            
           ],
         ),
@@ -152,7 +167,9 @@ class SigninScreenState extends State<SigninScreen>{
   Widget SigninButton(){
     return ElevatedButton(
       style : ElevatedButton.styleFrom(
-          primary: (isLoadingForm == true ? Colors.green[600] : Colors.green[700]),
+          primary: isLoadingForm == true 
+            ? Colors.green[600] 
+            : Colors.green[700],
           onPrimary: Colors.white,          
           textStyle: TextStyle(
             fontSize: 16
@@ -164,8 +181,8 @@ class SigninScreenState extends State<SigninScreen>{
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             isLoadingForm == true
-            ? Spinner( icon: Icons.rotate_right )        
-            : Icon( Icons.save),
+              ? Spinner( icon: Icons.rotate_right )        
+              : Icon( Icons.save),
             Padding(
               padding: EdgeInsets.only(left : 5),
               child : Text("Kirim")
@@ -243,8 +260,10 @@ class SigninScreenState extends State<SigninScreen>{
           final prefs = await SharedPreferences.getInstance();
 
           await prefs.setString('token', 'Bearer '+responseBody["access_token"]);
-          await prefs.setString('user',json.encode(responseBody["user"]));
+          // await prefs.setString('user',json.encode(responseBody["user"]));
           
+          Provider.of<User>(context).setIsLogin(true);
+
           Navigator.of(parentContext).pushReplacementNamed("/dashboard");
         }else{
           print(response.statusCode);
@@ -263,7 +282,7 @@ class SigninScreenState extends State<SigninScreen>{
       print(e);
 
       Fluttertoast.showToast(
-          msg: "Something Wrong",
+          msg: "Terjadi Kesalahan",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,

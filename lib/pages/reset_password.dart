@@ -2,11 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
 import 'dart:convert';
+
 import '../components/spinner.dart';
 
+import '../providers/user.dart';
+
 class ResetPassword extends StatelessWidget{
+  ResetPassword(BuildContext context){
+    final isLogin = Provider.of<User>(context).getIsLogin();
+
+    if(isLogin == true){
+      Navigator.of(context).pushReplacementNamed("/dashboard");
+    }
+  }
+
   Widget build(BuildContext context){    
    final arguments = ModalRoute.of(context)?.settings.arguments as Map<String,dynamic>;   
 
@@ -14,21 +26,27 @@ class ResetPassword extends StatelessWidget{
       home : Scaffold(      
         backgroundColor : Colors.white,
         body : Padding(
-          padding : EdgeInsets.only(left : 20,right : 20),
+          padding : EdgeInsets.only(
+            left : 20,
+            right : 20
+          ),
           child : Column(    
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(                      
                 child: 
-                 SvgPicture.asset(
-                  'images/reset-password.svg',
+                 Image.asset(
+                  'images/reset-password.png',
                   alignment: Alignment.center,
                   width: double.infinity,
                   height: 200,
                 )
               ),            
-              ResetPasswordScreen(email : arguments["email"],parentContext : context),
+              ResetPasswordScreen(
+                email : arguments["email"],
+                parentContext : context
+              ),
             ]
           )
         )
@@ -47,7 +65,10 @@ class ResetPasswordScreen extends StatefulWidget{
   });
 
   @override 
-  ResetPasswordScreenState createState() => ResetPasswordScreenState(email : email,parentContext : parentContext);
+  ResetPasswordScreenState createState() => ResetPasswordScreenState(
+    email : email,
+    parentContext : parentContext
+  );
 }
 
 class ResetPasswordScreenState extends State<ResetPasswordScreen>{  
@@ -79,7 +100,9 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen>{
             PasswordConfirmField(),    
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: [ResetPasswordButton()]
+              children: <Widget>[
+                ResetPasswordButton()
+              ]
             ),            
           ],
         ),
@@ -265,7 +288,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen>{
       print(e);
 
       Fluttertoast.showToast(
-          msg: "Something Wrong",
+          msg: "Terjadi Kesalahan",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,
