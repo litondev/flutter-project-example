@@ -26,7 +26,7 @@ class ForgotPassword extends StatelessWidget{
                   height: 200,
                 )
               ),            
-              // ForgotPassword(),
+              ForgotPasswordScreen(context),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children : [                
@@ -50,123 +50,188 @@ class ForgotPassword extends StatelessWidget{
   }
 }
 
-// class ForgotPasswordScreen extends StatefulWidget{
-//   @override 
-//   ForgotPasswordState createState() => ForgotPasswordState();
-// }
+class ForgotPasswordScreen extends StatefulWidget{
+  final parentContext;
 
-// class ForgotPasswordState extends State<ForgotPasswordScreen>{  
-//   final formKey = GlobalKey<FormState>();
+  ForgotPasswordScreen(this.parentContext);
 
-//   String email = '';
-//   bool isLoadingForm = false;
+  @override 
+  ForgotPasswordState createState() => ForgotPasswordState(parentContext);
+}
 
-//   @override 
-//   Widget build(BuildContext context){
-//     return Container(
-//       child : Form(
-//         key: formKey,
-//         child: Column(
-//           children: [
-//             EmailField(),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.start,
-//               children: [ForgotPasswordButton()]
-//             ),            
-//           ],
-//         ),
-//       )
-//     );
-//   }
+class ForgotPasswordState extends State<ForgotPasswordScreen>{  
+  final formKey = GlobalKey<FormState>();
+  final parentContext;
 
+  String email = '';
+  bool isLoadingForm = false;
 
-//   Widget EmailField(){
-//     return TextFormField(
-//       decoration: InputDecoration(
-//         labelText: "Email",
-//         // hintText: "*Masukan email"
-//       ),
-//       validator: (value) {        
-//         if(value!.isEmpty){
-//           return "Email tidak boleh kosong";
-//         }
+  ForgotPasswordState(this.parentContext);
 
-//         return null;
-//       },
-//     );
-//   }
+  @override 
+  Widget build(BuildContext context){
+    return Container(
+      child : Form(
+        key: formKey,
+        child: Column(
+          children: [
+            EmailField(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                ForgotPasswordButton()
+              ]
+            ),            
+          ],
+        ),
+      )
+    );
+  }
 
 
-//   Widget ForgotPasswordButton(){
-//     return ElevatedButton(
-//       style : ElevatedButton.styleFrom(
-//           primary: isLoadingForm == true 
-//             ? Colors.green[600] 
-//             : Colors.green[700],
-//           onPrimary: Colors.white,          
-//           textStyle: TextStyle(
-//             fontSize: 16
-//           ),
-//           fixedSize : Size(130,40)
-//       ),
-//       child: Center(
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.start,
-//           children: [
-//             isLoadingForm == true
-//             ? Spinner( icon: Icons.rotate_right )        
-//             : Icon( Icons.save),
-//             Padding(
-//               padding: EdgeInsets.only(left : 5),
-//               child : Text("Kirim")
-//             )
-//           ],
-//         )
-//       ),
-//       onPressed: (){
-//         if(formKey.currentState!.validate()){
-//             formKey.currentState?.save(); 
-//             onSubmit();
-//         }
-//       },
-//     );
-//   }
+  Widget EmailField(){
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: "Email",
+        // hintText: "*Masukan email"
+      ),
+      validator: (value) {        
+        if(value!.isEmpty){
+          return "Email tidak boleh kosong";
+        }
 
-//   void onSubmit() async {
-//     if(isLoadingForm) return;
+        return null;
+      },
+      onSaved: (String? value) { 
+        email = value.toString();
+      },
+    );
+  }
 
-//     setState(() {    
-//       isLoadingForm = true;
-//     });
+
+  Widget ForgotPasswordButton(){
+    return ElevatedButton(
+      style : ElevatedButton.styleFrom(
+          primary: isLoadingForm == true 
+            ? Colors.green[600] 
+            : Colors.green[700],
+          onPrimary: Colors.white,          
+          textStyle: TextStyle(
+            fontSize: 16
+          ),
+          fixedSize : Size(130,40)
+      ),
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            isLoadingForm == true
+            ? Spinner( icon: Icons.rotate_right )        
+            : Icon( Icons.save),
+            Padding(
+              padding: EdgeInsets.only(left : 5),
+              child : Text("Kirim")
+            )
+          ],
+        )
+      ),
+      onPressed: (){
+        if(formKey.currentState!.validate()){
+            formKey.currentState?.save(); 
+            onSubmit();
+        }
+      },
+    );
+  }
+
+  void onSubmit() async {
+    if(isLoadingForm) return;
+
+    setState(() {    
+      isLoadingForm = true;
+    });
     
-//     try{    
-//         var response = await http.post(
-//           Uri.parse(dotenv.env['API_URL']! + "/forgot_password"),
-//           headers : {
-//              "Content-Type": "application/json"
-//           },
-//           body : jsonEncode({          
-//             "email" : email,        
-//           })
-//         );    
+    try{    
+        var response = await http.post(
+          Uri.parse(dotenv.env['API_URL']! + "/forgot-password"),
+          headers : {
+             "Content-Type": "application/json"
+          },
+          body : jsonEncode({          
+            "email" : email,        
+          })
+        );    
 
-//         print(json.decode(response.body));
-//     }catch(e){
-//       print(e);
+         if(response.statusCode == 404){
+          Fluttertoast.showToast(
+            msg: "Url tidak ditemukan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 422){
+          var message = json.decode(response.body);
 
-//       Fluttertoast.showToast(
-//           msg: "Something Wrong",
-//           toastLength: Toast.LENGTH_LONG,
-//           gravity: ToastGravity.TOP,
-//           timeInSecForIosWeb: 1,
-//           backgroundColor: Colors.red,
-//           textColor: Colors.white,
-//           fontSize: 16.0,         
-//       );
-//     }finally{
-//       setState(() {    
-//         isLoadingForm = false;
-//       });
-//     }
-//   }
-// }
+          Fluttertoast.showToast(
+            msg: message["message"],
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 500){      
+          var message = json.decode(response.body);
+          print(message);
+
+          Fluttertoast.showToast(
+            msg: message["message"] ?? "Terjadi Kesalahan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 200){
+          Navigator.of(parentContext).pushReplacementNamed("/reset_password",
+            arguments : {
+              "email" : email
+            }
+          );
+        }else{
+          print(response.statusCode);
+          
+          Fluttertoast.showToast(
+            msg: "Terjadi Kesalahan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }
+    }catch(e){
+      print(e);
+
+      Fluttertoast.showToast(
+          msg: "Something Wrong",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,         
+      );
+    }finally{
+      setState(() {    
+        isLoadingForm = false;
+      });
+    }
+  }
+}

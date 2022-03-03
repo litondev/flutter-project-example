@@ -205,7 +205,7 @@ class SignupScreenState extends State<SignupScreen>{
         );    
 
 
-        if(response.statusCode == 400){
+         if(response.statusCode == 404){
           Fluttertoast.showToast(
             msg: "Url tidak ditemukan",
             toastLength: Toast.LENGTH_LONG,
@@ -250,6 +250,8 @@ class SignupScreenState extends State<SignupScreen>{
             fontSize: 16.0,         
           );
         }else{
+          print(response.statusCode);
+          
           Fluttertoast.showToast(
             msg: "Terjadi Kesalahan",
             toastLength: Toast.LENGTH_LONG,

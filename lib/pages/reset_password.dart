@@ -7,7 +7,9 @@ import 'dart:convert';
 import '../components/spinner.dart';
 
 class ResetPassword extends StatelessWidget{
-  Widget build(BuildContext context){
+  Widget build(BuildContext context){    
+   final arguments = ModalRoute.of(context)?.settings.arguments as Map<String,dynamic>;   
+
     return MaterialApp(
       home : Scaffold(      
         backgroundColor : Colors.white,
@@ -20,13 +22,13 @@ class ResetPassword extends StatelessWidget{
               Container(                      
                 child: 
                  SvgPicture.asset(
-                  'images/reset_password.svg',
+                  'images/reset-password.svg',
                   alignment: Alignment.center,
                   width: double.infinity,
                   height: 200,
                 )
               ),            
-              ResetPasswordScreen(),
+              ResetPasswordScreen(email : arguments["email"],parentContext : context),
             ]
           )
         )
@@ -36,24 +38,37 @@ class ResetPassword extends StatelessWidget{
 }
 
 class ResetPasswordScreen extends StatefulWidget{
+  final email;
+  final parentContext;
+
+  ResetPasswordScreen({
+    @required this.email,
+    @required this.parentContext
+  });
+
   @override 
-  ResetPasswordScreenState createState() => ResetPasswordScreenState();
+  ResetPasswordScreenState createState() => ResetPasswordScreenState(email : email,parentContext : parentContext);
 }
 
 class ResetPasswordScreenState extends State<ResetPasswordScreen>{  
-  final formKey = GlobalKey<FormState>();
 
-  String email = '';
+  final formKey = GlobalKey<FormState>();
+  final parentContext;
+  
+  String? email = '';
   String token = '';
   String password = '';
   String password_confirm = '';
   bool isLoadingForm = false;
+  
+
+  ResetPasswordScreenState({
+    @required this.email,
+    @required this.parentContext
+  });
 
   @override 
   Widget build(BuildContext context){
-    // GET EMAIL
-    email = ModalRoute.of(context)?.settings.arguments as String;
-
     return Container(
       child : Form(
         key: formKey,
@@ -85,6 +100,9 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen>{
 
         return null;
       },
+      onSaved: (String? value) { 
+        token = value.toString();
+      },
     );
   }
 
@@ -105,6 +123,9 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen>{
         }
 
         return null;
+      },
+      onSaved: (String? value) { 
+        password = value.toString();
       },
     );
   }
@@ -128,13 +149,18 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen>{
 
         return null;
       },
+      onSaved: (String? value) { 
+        password_confirm = value.toString();
+      },
     );
   }
 
   Widget ResetPasswordButton(){
     return ElevatedButton(
       style : ElevatedButton.styleFrom(
-          primary: (isLoadingForm == true ? Colors.green[600] : Colors.green[700]),
+          primary: isLoadingForm == true 
+            ? Colors.green[600] 
+            : Colors.green[700],
           onPrimary: Colors.white,          
           textStyle: TextStyle(
             fontSize: 16
@@ -173,7 +199,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen>{
     
     try{    
         var response = await http.post(
-          Uri.parse(dotenv.env['API_URL']! + "/reset_password"),
+          Uri.parse(dotenv.env['API_URL']! + "/reset-password"),
           headers : {
              "Content-Type": "application/json"
           },
@@ -181,11 +207,60 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen>{
             "token" : token,
             "email" : email,
             "password" : password,
-            "password_confirm" : password_confirm
+            "password_confirmation" : password_confirm
           })
         );    
 
-        print(json.decode(response.body));
+        if(response.statusCode == 404){
+          Fluttertoast.showToast(
+            msg: "Url tidak ditemukan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 422){
+          var message = json.decode(response.body);
+
+          Fluttertoast.showToast(
+            msg: message["message"],
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 500){      
+          var message = json.decode(response.body);
+          print(message);
+
+          Fluttertoast.showToast(
+            msg: message["message"] ?? "Terjadi Kesalahan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }else if(response.statusCode == 200){
+          Navigator.of(parentContext).pushReplacementNamed("/");
+        }else{
+          print(response.statusCode);
+          
+          Fluttertoast.showToast(
+            msg: "Terjadi Kesalahan",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,         
+          );
+        }
     }catch(e){
       print(e);
 
