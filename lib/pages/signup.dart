@@ -9,16 +9,20 @@ import '../components/spinner.dart';
 
 import '../providers/user.dart';
 
+import "./dashboard.dart";
+
 class Signup extends StatelessWidget{
+  bool? isLogin;
+
   Signup(BuildContext context){
-    final isLogin = Provider.of<User>(context).getIsLogin();
-    
-    if(isLogin == true){
-      Navigator.of(context).pushReplacementNamed("/dashboard");
-    }
-  }
+    this.isLogin = Provider.of<User>(context).getIsLogin();
+  } 
 
   Widget build(BuildContext context){
+    if(isLogin == true){
+      return Dashboard(context);
+    }
+
     return MaterialApp(
       home : Scaffold(      
         backgroundColor : Colors.white,
@@ -34,7 +38,7 @@ class Signup extends StatelessWidget{
               Container(                      
                 child: 
                  Image.asset(
-                  'images/signup.svg',
+                  'images/signup.png',
                   alignment: Alignment.center,
                   width: double.infinity,
                   height: 200,

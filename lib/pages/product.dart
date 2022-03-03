@@ -5,22 +5,26 @@ import "../components/sidebar.dart";
 
 import '../providers/user.dart';
 
-class Product extends StatelessWidget{
-  Product(BuildContext context){
-    final isLogin = Provider.of<User>(context).getIsLogin();
+import './signin.dart';
 
-    if(isLogin != true){
-      Navigator.of(context).pushReplacementNamed("/");
-    }
-  }
+class Product extends StatelessWidget{
+   bool? isLogin;
+
+  Product(BuildContext context){
+    this.isLogin = Provider.of<User>(context).getIsLogin();
+  } 
 
   Widget build(BuildContext context){
+    if(isLogin != true){
+      return Signin(context);
+    }
+
     return MaterialApp(
       home : Scaffold(
         appBar: AppBar(
           title : Text("Product"),      
         ),
-        drawer: Sidebar(),
+        drawer: Sidebar(parentContext: context),
         body : Text("Product")
       )
     );

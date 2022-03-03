@@ -11,16 +11,20 @@ import '../components/spinner.dart';
 
 import '../providers/user.dart';
 
-class Signin extends StatelessWidget{
-  Signin(BuildContext context){
-    final isLogin = Provider.of<User>(context).getIsLogin();
+import "./dashboard.dart";
 
-    if(isLogin){
-      Navigator.of(context).pushReplacementNamed("/dashboard");
-    }
-  }
+class Signin extends StatelessWidget{
+  bool? isLogin;
+
+  Signin(BuildContext context){
+    this.isLogin = Provider.of<User>(context).getIsLogin();
+  } 
 
   Widget build(BuildContext context){
+    if(isLogin == true){
+      return Dashboard(context);
+    }
+
     return MaterialApp(
       home : Scaffold(      
         backgroundColor : Colors.white,
@@ -84,6 +88,11 @@ class SigninScreenState extends State<SigninScreen>{
   String email = '';
   String password = '';
   bool isLoadingForm = false;
+
+  @override 
+  void dispose(){    
+    super.dispose();
+  }
 
   @override 
   Widget build(BuildContext context){
@@ -204,7 +213,7 @@ class SigninScreenState extends State<SigninScreen>{
 
     setState(() {    
       isLoadingForm = true;
-    });
+    });    
     
     try{    
         var response = await http.post(
@@ -262,9 +271,7 @@ class SigninScreenState extends State<SigninScreen>{
           await prefs.setString('token', 'Bearer '+responseBody["access_token"]);
           // await prefs.setString('user',json.encode(responseBody["user"]));
           
-          Provider.of<User>(context).setIsLogin(true);
-
-          Navigator.of(parentContext).pushReplacementNamed("/dashboard");
+          Provider.of<User>(context,listen: false).setIsLogin(true);        
         }else{
           print(response.statusCode);
           
@@ -290,7 +297,7 @@ class SigninScreenState extends State<SigninScreen>{
           textColor: Colors.white,
           fontSize: 16.0,         
       );
-    }finally{
+
       setState(() {    
         isLoadingForm = false;
       });

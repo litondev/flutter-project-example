@@ -10,16 +10,20 @@ import '../components/spinner.dart';
 
 import '../providers/user.dart';
 
-class ForgotPassword extends StatelessWidget{
-  ForgotPassword(BuildContext context){
-    final isLogin = Provider.of<User>(context).getIsLogin();
+import "./dashboard.dart";
 
-    if(isLogin == true){
-      Navigator.of(context).pushReplacementNamed("/dashboard");
-    }
-  }
+class ForgotPassword extends StatelessWidget{
+  bool? isLogin;
+
+  ForgotPassword(BuildContext context){
+    this.isLogin = Provider.of<User>(context).getIsLogin();
+  } 
   
   Widget build(BuildContext context){
+    if(isLogin == true){
+      return Dashboard(context);
+    }
+
     return MaterialApp(
       home : Scaffold(      
         backgroundColor : Colors.white,

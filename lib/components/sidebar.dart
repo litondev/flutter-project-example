@@ -5,6 +5,12 @@ import 'package:provider/provider.dart';
 import '../providers/user.dart';
 
 class Sidebar extends StatelessWidget{
+  final parentContext;
+
+  Sidebar({
+    @required this.parentContext
+  });
+
   @override 
   Widget build(BuildContext context){
     return Drawer(
@@ -21,7 +27,7 @@ class Sidebar extends StatelessWidget{
             leading: Icon(Icons.devices),
             title: Text("Dashabord"),
             onTap: (){
-              Navigator.of(context).pushReplacementNamed("/dashboard");
+              Navigator.of(parentContext).pushReplacementNamed("/dashboard");
             }
           ),
 
@@ -31,7 +37,7 @@ class Sidebar extends StatelessWidget{
             leading: Icon(Icons.devices),
             title: Text("Product"),
             onTap: (){
-              Navigator.of(context).pushReplacementNamed("/product");
+              Navigator.of(parentContext).pushReplacementNamed("/product");
             }
           ),
 
@@ -41,7 +47,7 @@ class Sidebar extends StatelessWidget{
             leading: Icon(Icons.lens),
             title : Text("Profil"),
             onTap: (){
-              Navigator.of(context).pushReplacementNamed("/profil");
+              Navigator.of(parentContext).pushReplacementNamed("/profil");
             },
           ),
 
@@ -50,7 +56,7 @@ class Sidebar extends StatelessWidget{
           ListTile(
             leading: Icon(Icons.lens),
             title : Text("Logout"),
-            onTap: () => onLogout(context)
+            onTap: () => onLogout(parentContext)
           )
         ],
       )
@@ -64,8 +70,12 @@ class Sidebar extends StatelessWidget{
 
     // await prefs.remove("user");
 
-    Provider.of<User>(context).setIsLogin(false);
+    Provider.of<User>(context,listen : false).setIsLogin(false);
 
-    Navigator.of(context).pushReplacementNamed("/");            
+    // await Future.delayed(Duration(seconds: 30));
+    
+    Navigator.of(context).pushReplacementNamed("/");     
+    
+    // Navigator.of(context).pop();           
   }
 }

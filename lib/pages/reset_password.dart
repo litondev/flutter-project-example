@@ -10,16 +10,20 @@ import '../components/spinner.dart';
 
 import '../providers/user.dart';
 
-class ResetPassword extends StatelessWidget{
-  ResetPassword(BuildContext context){
-    final isLogin = Provider.of<User>(context).getIsLogin();
+import "./dashboard.dart";
 
-    if(isLogin == true){
-      Navigator.of(context).pushReplacementNamed("/dashboard");
-    }
-  }
+class ResetPassword extends StatelessWidget{
+  bool? isLogin;
+
+  ResetPassword(BuildContext context){
+    this.isLogin = Provider.of<User>(context).getIsLogin();
+  } 
 
   Widget build(BuildContext context){    
+    if(isLogin == true){
+      return Dashboard(context);
+    }
+
    final arguments = ModalRoute.of(context)?.settings.arguments as Map<String,dynamic>;   
 
     return MaterialApp(
