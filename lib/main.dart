@@ -11,6 +11,8 @@ import "./pages/dashboard.dart";
 import "./pages/product.dart";
 import "./pages/profil.dart";
 
+import "./screens/product_add.dart";
+
 import './providers/user.dart';
 import "./providers/product.dart";
 
@@ -49,7 +51,10 @@ class MyApp extends StatelessWidget {
           '/reset_password' : (context) => ResetPassword(context),
 
           '/dashboard' : (context) => Dashboard(context),
+
           '/product' : (context) => Product(context),
+          "/product/add" : (context) => ProductAdd(context),
+          
           '/profil' : (context) => Profil(context)
         },
       )    

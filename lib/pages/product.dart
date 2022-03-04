@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/models/product.dart';
 import 'package:provider/provider.dart';
 
 import "../components/sidebar.dart";
@@ -28,6 +29,10 @@ class Product extends StatelessWidget{
             IconButton(
               onPressed: () => Navigator.of(context).pushNamed("/product/add"),
               icon: Icon(Icons.add)
+            ),
+            IconButton(
+              onPressed: () => print("Sorting and Search"),
+              icon : Icon(Icons.search)
             )
           ],   
         ),
@@ -47,20 +52,28 @@ class ProductScreeen extends StatefulWidget{
 class ProductScreenState extends State<ProductScreeen>{
   final isLoading = false;
   
-  Future<void> onLoad() async{
-
+  onLoad(){
+    try{
+      Provider.of<ProductProvider>(context,listen : false).onLoad();
+    }catch(e){
+      print(e);
+    }
   }
 
-  Future<void> onDelete(Map<String,dynamic> product) async{
-    // Provider.of<Product>(context,listen: false)
-    // .removeProduct(id as String)
-    // .then((_) {
-    //   Navigator.of(context).pop(false);
-    // });
+  onDelete(ModelProduct product){
+    try{
+      Provider.of<ProductProvider>(context,listen: false)
+        .onDelete(product.id)
+        .then((_) {
+          Navigator.of(context).pop(false);
+        });
+    }catch(e){
+      print(e);
+    }
   }
 
-  Future<void> onUpdate(Map<String,dynamic> product) async{
-    // Navigator.of(context).pushNamed("/add-product",arguments: );
+  onUpdate(ModelProduct product){
+    Navigator.of(context).pushNamed("/product/add",arguments: product.id);    
   }
 
   Widget build(BuildContext context){
@@ -84,12 +97,12 @@ class ProductScreenState extends State<ProductScreeen>{
           child: RefreshIndicator(
             onRefresh: () => onLoad(),
             child: Consumer<ProductProvider>(
-              builder: (context,product,child) => product.items["data"].length == 0 
+              builder: (context,product,child) => product.items.length == 0 
               ? Center(child: Text("Data tidak ditemukan"),)
               : ListView.builder(
-                itemCount : product.items["data"].length,
+                itemCount : product.items.length,
                 itemBuilder :(ctx,i) => Dismissible(
-                  key : ValueKey(product.items["data"][i]["id"]),
+                  key : ValueKey(product.items[i].id),
 
                   background: Container(
                       color : Theme.of(context).errorColor,
@@ -143,7 +156,7 @@ class ProductScreenState extends State<ProductScreeen>{
                       )
                     ).then((result) {                                
                       if(result){     
-                        onDelete(product.items["data"][i]);                       
+                        onDelete(product.items[i]);                       
                       }            
                     });
                   },
@@ -168,7 +181,7 @@ class ProductScreenState extends State<ProductScreeen>{
                           children: <Widget>[
                             // EDIT BUTTON
                             IconButton(
-                              onPressed: () => onUpdate(product.items["data"][i]),
+                              onPressed: () => onUpdate(product.items[i]),
                               icon: Icon(Icons.edit)
                             ),
 
@@ -195,7 +208,7 @@ class ProductScreenState extends State<ProductScreeen>{
                                       ),  
 
                                       TextButton(
-                                        onPressed: () => onDelete(product.items["data"][i]),
+                                        onPressed: () => onDelete(product.items[i]),
                                         child: Text(
                                           "Lanjutkan",
                                           style:  TextStyle( 
