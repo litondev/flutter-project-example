@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import "../models/product.dart";
@@ -10,9 +11,9 @@ class ProductProvider extends ChangeNotifier{
   List<ModelProduct> items = [];
 
   Map<String,dynamic> itemsPagination = {    
-    "total" : 0,
-    "per_page" : 10,
-    "current_page" : 1,
+    "total" : "0",
+    "per_page" : "10",
+    "current_page" : "1",
     "search" : "",  
     "column" : "id",
     "order" : "desc"
@@ -23,18 +24,22 @@ class ProductProvider extends ChangeNotifier{
   }
 
   Future<void> onLoad() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
     final queryString = "?page=" + itemsPagination["current_page"] + 
       "&column=" + itemsPagination["column"] +
       "&order=" + itemsPagination["order"] + 
-      "&per_page=" + itemsPagination["per_page"] + 
+      "&per_page=" + itemsPagination["per_page"] +
       "&search=" + itemsPagination["search"];
 
     final url = Uri.parse(dotenv.env['API_URL']! + "/product" + queryString);
     
     final response = await http.get(
       url,
-      headers : {
-        'accept' : 'application/json'
+      headers : <String,String> {
+        'accept' : 'application/json',
+        'Authorization' : token!
       }
     );
 
@@ -68,20 +73,20 @@ class ProductProvider extends ChangeNotifier{
           return ModelProduct(
             id: item["id"], 
             title: item["title"], 
-            price: item["price"], 
-            stock: item["stock"], 
+            price: double.parse(item["price"]).toInt(), 
+            stock: double.parse(item["stock"]).toInt(), 
             description: item["description"]
           );
         }).toList()
       ];      
 
       itemsPagination = {
-        "current_page" : convertData["current_page"],
-        "per_page" : convertData["per_page"],
-        "total" : convertData["total"],
-        "search" : itemsPagination["search"],
-        "column" : itemsPagination["column"],
-        "order" : itemsPagination["order"]
+        "current_page" : convertData["current_page"].toString(),
+        "per_page" : convertData["per_page"].toString(),
+        "total" : convertData["total"].toString(),
+        "search" : itemsPagination["search"].toString(),
+        "column" : itemsPagination["column"].toString(),
+        "order" : itemsPagination["order"].toString()
       };
 
       notifyListeners();
@@ -101,7 +106,8 @@ class ProductProvider extends ChangeNotifier{
   }
 
   Future<void> onDelete(int? id) async {
-    final url = Uri.parse(dotenv.env['API_URL']! + "/product/" + (id as String));
+  
+    final url = Uri.parse(dotenv.env['API_URL']! + "/product/" + id.toString());
     
     final response = await http.delete(
       url,

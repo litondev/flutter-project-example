@@ -37,8 +37,8 @@ class Product extends StatelessWidget{
           ],   
         ),
         drawer: Sidebar(parentContext: context),
-        body: Text("Product"),
-        // body : ProductScreeen()
+        // body: Text("Product"),
+        body : ProductScreeen()
       )
     );
   }
@@ -51,34 +51,10 @@ class ProductScreeen extends StatefulWidget{
 
 class ProductScreenState extends State<ProductScreeen>{
   final isLoading = false;
-  
-  onLoad(){
-    try{
-      Provider.of<ProductProvider>(context,listen : false).onLoad();
-    }catch(e){
-      print(e);
-    }
-  }
-
-  onDelete(ModelProduct product){
-    try{
-      Provider.of<ProductProvider>(context,listen: false)
-        .onDelete(product.id)
-        .then((_) {
-          Navigator.of(context).pop(false);
-        });
-    }catch(e){
-      print(e);
-    }
-  }
-
-  onUpdate(ModelProduct product){
-    Navigator.of(context).pushNamed("/product/add",arguments: product.id);    
-  }
 
   Widget build(BuildContext context){
     return FutureBuilder(
-      future: onLoad(),
+      future: Provider.of<ProductProvider>(context,listen : false).onLoad(),
       builder: (ctx,snapshot){
         if(snapshot.connectionState == ConnectionState.waiting){
           return Center(
@@ -95,7 +71,7 @@ class ProductScreenState extends State<ProductScreeen>{
         return Padding(
           padding: EdgeInsets.all(10),
           child: RefreshIndicator(
-            onRefresh: () => onLoad(),
+            onRefresh: () => Provider.of<ProductProvider>(context,listen : false).onLoad(),
             child: Consumer<ProductProvider>(
               builder: (context,product,child) => product.items.length == 0 
               ? Center(child: Text("Data tidak ditemukan"),)
@@ -107,7 +83,7 @@ class ProductScreenState extends State<ProductScreeen>{
                   background: Container(
                       color : Theme.of(context).errorColor,
                       child: Icon(
-                        Icons.call_missed_outgoing,
+                        Icons.delete,
                         size : 40,
                         color: Colors.white,
                       ),
@@ -145,7 +121,7 @@ class ProductScreenState extends State<ProductScreeen>{
                               Navigator.of(ctx).pop(true);
                             }, 
                             child: Text(
-                              "Yes",
+                              "Iya",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold
@@ -156,20 +132,24 @@ class ProductScreenState extends State<ProductScreeen>{
                       )
                     ).then((result) {                                
                       if(result){     
-                        onDelete(product.items[i]);                       
+                        Provider.of<ProductProvider>(ctx,listen: false)
+                        .onDelete(product.items[i].id)
+                        .then((_) {
+                          Navigator.of(ctx).pop(false);
+                        });            
                       }            
                     });
                   },
 
                   child: Card(
-                    elevation: 4,
+                    elevation: 2.5,
                     child:  ListTile(
                       leading: CircleAvatar(
-                        child : Text("Title 1"),
+                        child : Text(product.items[i].title as String),
                       ),
-                      title : Text("Title 2"),
+                      title : Text(product.items[i].title as String),
                         subtitle: Text(
-                        'Sub title',
+                        product.items[i].description ?? '-',
                         style: TextStyle(
                           color:Colors.grey,
                           fontSize: 12
@@ -181,7 +161,9 @@ class ProductScreenState extends State<ProductScreeen>{
                           children: <Widget>[
                             // EDIT BUTTON
                             IconButton(
-                              onPressed: () => onUpdate(product.items[i]),
+                              onPressed: () => {
+                                Navigator.of(context).pushNamed("/product/add",arguments: product.items[i].id)
+                              },
                               icon: Icon(Icons.edit)
                             ),
 
@@ -196,7 +178,7 @@ class ProductScreenState extends State<ProductScreeen>{
                                     actions: <Widget>[
                                       TextButton(
                                         onPressed: (){
-                                          Navigator.of(context).pop(false);
+                                          Navigator.of(ctx).pop(false);
                                         }, 
                                         child: Text(
                                           "Batal",
@@ -208,7 +190,13 @@ class ProductScreenState extends State<ProductScreeen>{
                                       ),  
 
                                       TextButton(
-                                        onPressed: () => onDelete(product.items[i]),
+                                        onPressed: () => {
+                                           Provider.of<ProductProvider>(ctx,listen: false)
+                                            .onDelete(product.items[i].id)
+                                            .then((_) {
+                                              Navigator.of(ctx).pop(false);
+                                            })
+                                        },
                                         child: Text(
                                           "Lanjutkan",
                                           style:  TextStyle( 
