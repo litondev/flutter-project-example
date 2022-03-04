@@ -16,7 +16,7 @@ class ResetPassword extends StatelessWidget{
   bool? isLogin;
 
   ResetPassword(BuildContext context){
-    this.isLogin = Provider.of<User>(context).getIsLogin();
+    this.isLogin = Provider.of<UserProvider>(context).getIsLogin();
   } 
 
   Widget build(BuildContext context){    

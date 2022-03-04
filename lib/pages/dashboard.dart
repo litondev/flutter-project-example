@@ -11,7 +11,7 @@ class Dashboard extends StatelessWidget{
   bool? isLogin;
 
   Dashboard(BuildContext context){
-    this.isLogin = Provider.of<User>(context).getIsLogin();
+    this.isLogin = Provider.of<UserProvider>(context).getIsLogin();
   } 
 
   Widget build(BuildContext context){

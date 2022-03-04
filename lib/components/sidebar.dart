@@ -70,7 +70,7 @@ class Sidebar extends StatelessWidget{
 
     // await prefs.remove("user");
 
-    Provider.of<User>(context,listen : false).setIsLogin(false);
+    Provider.of<UserProvider>(context,listen : false).setIsLogin(false);
 
     // await Future.delayed(Duration(seconds: 30));
     

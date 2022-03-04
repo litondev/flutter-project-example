@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import  "../models/user.dart";
 
-class User extends ChangeNotifier{  
+class UserProvider extends ChangeNotifier{  
   ModelUser? _user;
   bool _isLogin = false;
 
-  User(this._isLogin);
+  UserProvider(this._isLogin);
 
   setUser(Map<String,dynamic> user){
     _user = ModelUser(

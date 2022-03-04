@@ -17,7 +17,7 @@ class Signin extends StatelessWidget{
   bool? isLogin;
 
   Signin(BuildContext context){
-    this.isLogin = Provider.of<User>(context).getIsLogin();
+    this.isLogin = Provider.of<UserProvider>(context).getIsLogin();
   } 
 
   Widget build(BuildContext context){
@@ -271,7 +271,7 @@ class SigninScreenState extends State<SigninScreen>{
           await prefs.setString('token', 'Bearer '+responseBody["access_token"]);
           // await prefs.setString('user',json.encode(responseBody["user"]));
           
-          Provider.of<User>(context,listen: false).setIsLogin(true);        
+          Provider.of<UserProvider>(context,listen: false).setIsLogin(true);        
         }else{
           print(response.statusCode);
           

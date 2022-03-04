@@ -12,6 +12,7 @@ import "./pages/product.dart";
 import "./pages/profil.dart";
 
 import './providers/user.dart';
+import "./providers/product.dart";
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -33,8 +34,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context){    
     return MultiProvider(
       providers : [
-        ChangeNotifierProvider(
-          create: (context) => User(isLogin)
+        Provider<UserProvider>(
+          create: (context) => UserProvider(isLogin)
+        ),
+        Provider<ProductProvider>(
+          create: (context) => ProductProvider()
         )      
       ],
       child : MaterialApp(
