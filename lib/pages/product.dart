@@ -96,6 +96,7 @@ class Product extends StatelessWidget{
                               onChanged: (String? value){
                                 final pagination = Provider.of<ProductProvider>(context,listen: false).itemsPagination;
                                 pagination["search"] = value;                              
+                                pagination["current_page"] = 1.toString();
                               },
                             ),
                             DropdownButton(
@@ -113,7 +114,8 @@ class Product extends StatelessWidget{
                               ],
                               onChanged: (String? value){
                                 final pagination = Provider.of<ProductProvider>(context,listen: false).itemsPagination;
-                                pagination["column"] = value;   
+                                pagination["column"] = value;  
+                                pagination["current_page"] = 1.toString(); 
                               }
                             ),                          
                             ElevatedButton(
