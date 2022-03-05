@@ -75,7 +75,9 @@ class ProductProvider extends ChangeNotifier{
             title: item["title"], 
             price: double.parse(item["price"]).toInt(), 
             stock: double.parse(item["stock"]).toInt(), 
-            description: item["description"]
+            description: item['description'] == null 
+                ? "" 
+                : item["description"]      
           );
         }).toList()
       ];      
@@ -106,13 +108,16 @@ class ProductProvider extends ChangeNotifier{
   }
 
   Future<void> onDelete(int? id) async {
-  
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
     final url = Uri.parse(dotenv.env['API_URL']! + "/product/" + id.toString());
     
     final response = await http.delete(
       url,
       headers: <String,String> {
-        "accept" : "application/json"
+        "accept" : "application/json",
+        "Authorization" : token!
       }
     );
 
@@ -140,6 +145,15 @@ class ProductProvider extends ChangeNotifier{
       );
     }else if(response.statusCode == 200){    
       await onLoad();
+      Fluttertoast.showToast(
+        msg: "Berhasil Hapus Data",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,         
+      );
     }else{
       print(response.statusCode);
           
@@ -155,123 +169,127 @@ class ProductProvider extends ChangeNotifier{
     }
   } 
 
-  Future<void> onUpdate(ModelProduct product) async {
-    final url = Uri.parse(dotenv.env['API_URL']! + "/product/" + (product.id as String));
+  // Future<void> onUpdate(ModelProduct product) async {
+  //   final url = Uri.parse(dotenv.env['API_URL']! + "/product/" + (product.id as String));
 
-    final response = await http.put(
-      url,
-      headers: <String,String> {
-        "Content-Type": "application/json"
-      },
-      body :jsonEncode( <String,dynamic> {
-        "title" : product.title,
-        "stock" : product.stock,
-        "price" : product.price,
-        "description" : product.description
-      })
-    );
+  //   final response = await http.put(
+  //     url,
+  //     headers: <String,String> {
+  //       "Content-Type": "application/json"
+  //     },
+  //     body :jsonEncode( <String,dynamic> {
+  //       "title" : product.title,
+  //       "stock" : product.stock,
+  //       "price" : product.price,
+  //       "description" : product.description
+  //     })
+  //   );
 
-    if(response.statusCode == 404){
-      Fluttertoast.showToast(
-        msg: "Url tidak ditemukan",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,         
-      );
-    }else if(response.statusCode == 500){
-      var message = json.decode(response.body);
+  //   if(response.statusCode == 404){
+  //     Fluttertoast.showToast(
+  //       msg: "Url tidak ditemukan",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.TOP,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,         
+  //     );
+  //   }else if(response.statusCode == 500){
+  //     var message = json.decode(response.body);
 
-      Fluttertoast.showToast(
-        msg: message["message"] ?? "Terjadi Kesalahan",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,         
-      );
-    }else if(response.statusCode == 200){    
-      await onLoad();
-    }else{
-      print(response.statusCode);
+  //     Fluttertoast.showToast(
+  //       msg: message["message"] ?? "Terjadi Kesalahan",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.TOP,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,         
+  //     );
+  //   }else if(response.statusCode == 200){    
+  //     await onLoad();
+  //   }else{
+  //     print(response.statusCode);
           
-      Fluttertoast.showToast(
-        msg: "Terjadi Kesalahan",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,         
-      );
-    }
-  }
+  //     Fluttertoast.showToast(
+  //       msg: "Terjadi Kesalahan",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.TOP,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,         
+  //     );
+  //   }
+  // }
 
-  Future<void> onAdd(ModelProduct product) async {
-    final url = Uri.parse(dotenv.env['API_URL']! + "/product");
+  // Future<void> onAdd(ModelProduct product) async {
+  //   final url = Uri.parse(dotenv.env['API_URL']! + "/product");
     
-    final response = await http.post(
-      url,
-      headers: <String,String> {
-        "Content-Type": "application/json"
-      },
-      body : jsonEncode( <String,dynamic> {
-        "title"  : product.title,
-        "stock" : product.stock,
-        "price" : product.price,
-        "description" : product.description
-      })
-    );
+  //   final response = await http.post(
+  //     url,
+  //     headers: <String,String> {
+  //       "Content-Type": "application/json"
+  //     },
+  //     body : jsonEncode( <String,dynamic> {
+  //       "title"  : product.title,
+  //       "stock" : product.stock,
+  //       "price" : product.price,
+  //       "description" : product.description
+  //     })
+  //   );
   
-    if(response.statusCode == 404){
-      Fluttertoast.showToast(
-        msg: "Url tidak ditemukan",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,         
-      );
-    }else if(response.statusCode == 500){
-      var message = json.decode(response.body);
+  //   if(response.statusCode == 404){
+  //     Fluttertoast.showToast(
+  //       msg: "Url tidak ditemukan",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.TOP,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,         
+  //     );
+  //   }else if(response.statusCode == 500){
+  //     var message = json.decode(response.body);
 
-      Fluttertoast.showToast(
-        msg: message["message"] ?? "Terjadi Kesalahan",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,         
-      );
-    }else if(response.statusCode == 200){    
-      await onLoad();
-    }else{
-      print(response.statusCode);
+  //     Fluttertoast.showToast(
+  //       msg: message["message"] ?? "Terjadi Kesalahan",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.TOP,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,         
+  //     );
+  //   }else if(response.statusCode == 200){    
+  //     await onLoad();
+  //   }else{
+  //     print(response.statusCode);
           
-      Fluttertoast.showToast(
-        msg: "Terjadi Kesalahan",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,         
-      );
-    }
-  }
+  //     Fluttertoast.showToast(
+  //       msg: "Terjadi Kesalahan",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.TOP,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,         
+  //     );
+  //   }
+  // }
 
   Future<ModelProduct?> onShow(int id) async {
-    final url = Uri.parse(dotenv.env['API_URL']! + "/product/" + (id as String));
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final url = Uri.parse(dotenv.env['API_URL']! + "/product/" + id.toString());
     
     final response = await http.get(
       url,
       headers : <String,String> {
-        "accept" : "application/json"
+        "accept" : "application/json",
+        "Authorization" : token!
       }
     );
 
@@ -303,10 +321,10 @@ class ProductProvider extends ChangeNotifier{
       return ModelProduct(
         id: convert['id'], 
         title: convert['title'], 
-        stock: convert['stock'], 
-        price : convert["price"],
+        stock: double.parse(convert['stock']).toInt(), 
+        price : double.parse(convert["price"]).toInt(),
         description: convert['description'] == null 
-          ? '-' 
+          ? "" 
           : convert["description"]
       );
     }else{

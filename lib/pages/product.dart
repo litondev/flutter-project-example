@@ -38,18 +38,26 @@ class Product extends StatelessWidget{
         ),
         drawer: Sidebar(parentContext: context),
         // body: Text("Product"),
-        body : ProductScreeen()
+        body : ProductScreeen(context)
       )
     );
   }
 }
 
 class ProductScreeen extends StatefulWidget{
+  final BuildContext parentContext;
+
+  ProductScreeen(this.parentContext);
+
   @override 
-  ProductScreenState createState() => ProductScreenState();
+  ProductScreenState createState() => ProductScreenState(parentContext);
 }
 
 class ProductScreenState extends State<ProductScreeen>{
+  final BuildContext parentContext;
+
+  ProductScreenState(this.parentContext);
+
   final isLoading = false;
 
   Widget build(BuildContext context){
@@ -118,7 +126,11 @@ class ProductScreenState extends State<ProductScreeen>{
                           ),  
                           TextButton(
                             onPressed: (){
-                              Navigator.of(ctx).pop(true);
+                                Provider.of<ProductProvider>(ctx,listen: false)
+                                .onDelete(product.items[i].id)
+                                .then((_) => {
+                                  Navigator.of(ctx).pop(false)
+                                });
                             }, 
                             child: Text(
                               "Iya",
@@ -130,15 +142,7 @@ class ProductScreenState extends State<ProductScreeen>{
                           )
                         ],
                       )
-                    ).then((result) {                                
-                      if(result){     
-                        Provider.of<ProductProvider>(ctx,listen: false)
-                        .onDelete(product.items[i].id)
-                        .then((_) {
-                          Navigator.of(ctx).pop(false);
-                        });            
-                      }            
-                    });
+                    );
                   },
 
                   child: Card(
@@ -162,7 +166,7 @@ class ProductScreenState extends State<ProductScreeen>{
                             // EDIT BUTTON
                             IconButton(
                               onPressed: () => {
-                                Navigator.of(context).pushNamed("/product/add",arguments: product.items[i].id)
+                                Navigator.of(parentContext).pushNamed("/product/add",arguments: product.items[i].id)
                               },
                               icon: Icon(Icons.edit)
                             ),
