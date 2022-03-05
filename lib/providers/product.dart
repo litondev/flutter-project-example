@@ -14,6 +14,7 @@ class ProductProvider extends ChangeNotifier{
     "total" : "0",
     "per_page" : "10",
     "current_page" : "1",
+    "last_page" : "0",
     "search" : "",  
     "column" : "id",
     "order" : "desc"
@@ -32,6 +33,8 @@ class ProductProvider extends ChangeNotifier{
       "&order=" + itemsPagination["order"] + 
       "&per_page=" + itemsPagination["per_page"] +
       "&search=" + itemsPagination["search"];
+
+    print(queryString);
 
     final url = Uri.parse(dotenv.env['API_URL']! + "/product" + queryString);
     
@@ -88,7 +91,8 @@ class ProductProvider extends ChangeNotifier{
         "total" : convertData["total"].toString(),
         "search" : itemsPagination["search"].toString(),
         "column" : itemsPagination["column"].toString(),
-        "order" : itemsPagination["order"].toString()
+        "order" : itemsPagination["order"].toString(),
+        "last_page" : convertData["last_page"].toString()
       };
 
       notifyListeners();

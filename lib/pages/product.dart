@@ -22,7 +22,54 @@ class Product extends StatelessWidget{
     }
 
     return MaterialApp(
+      theme: ThemeData(
+        bottomSheetTheme: BottomSheetThemeData(
+            backgroundColor: Colors.black.withOpacity(0)
+        ),
+      ),
       home : Scaffold(
+        bottomSheet: Opacity(
+          opacity : 1,
+          child : Container(
+            child: Row(           
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                  onPressed: (){
+                    final pagination = Provider.of<ProductProvider>(context,listen: false).itemsPagination;
+
+                    if(int.parse(pagination["current_page"]) <= 1){
+                      return;                
+                    }
+
+                    pagination["current_page"] = (int.parse(pagination["current_page"]) - 1).toString();
+
+                    print(pagination);
+
+                    Provider.of<ProductProvider>(context,listen: false).onLoad();
+                  },
+                  child: Text("Prev")
+                ),
+                TextButton(
+                  onPressed: (){
+                    final pagination = Provider.of<ProductProvider>(context,listen: false).itemsPagination;
+
+                    if(int.parse(pagination["current_page"]) >= int.parse(pagination["last_page"])){
+                      return;                
+                    }
+
+                    pagination["current_page"] = (int.parse(pagination["current_page"]) + 1).toString();
+
+                    print(pagination);
+
+                    Provider.of<ProductProvider>(context,listen: false).onLoad();
+                  },
+                  child: Text("Next")
+                )
+              ],
+            ),
+          )
+        ),
         appBar: AppBar(
           title : Text("Product"),   
           actions: <Widget>[
@@ -31,14 +78,78 @@ class Product extends StatelessWidget{
               icon: Icon(Icons.add)
             ),
             IconButton(
-              onPressed: () => print("Sorting and Search"),
+              onPressed: (){
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Container(
+                      height: 400,
+                      color: Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Column(
+                          children : [
+                            TextFormField(
+                              decoration: InputDecoration(
+                                labelText: "Email",
+                              ),                          
+                              onChanged: (String? value){
+                                final pagination = Provider.of<ProductProvider>(context,listen: false).itemsPagination;
+                                pagination["search"] = value;                              
+                              },
+                            ),
+                            DropdownButton(
+                              value: "id",
+                              icon: const Icon(Icons.keyboard_arrow_down),    
+                              items: [
+                                DropdownMenuItem(
+                                  value : "id",
+                                  child: Text("ID")
+                                ),
+                                DropdownMenuItem(
+                                  value: "title",
+                                  child: Text("title")
+                                )
+                              ],
+                              onChanged: (String? value){
+                                final pagination = Provider.of<ProductProvider>(context,listen: false).itemsPagination;
+                                pagination["column"] = value;   
+                              }
+                            ),                          
+                            ElevatedButton(
+                              onPressed: (){
+                                Provider.of<ProductProvider>(context,listen: false).onLoad();
+                                Navigator.pop(context);
+                              },
+                              child: Text("Search")
+                            )
+                          ]
+                        )
+                      ),
+                      // child: Center(
+                      //   child: Column(
+                      //     mainAxisAlignment: MainAxisAlignment.center,
+                      //     mainAxisSize: MainAxisSize.min,
+                      //     children: <Widget>[
+                      //       const Text('Modal BottomSheet'),
+                      //       ElevatedButton(
+                      //         child: const Text('Close BottomSheet'),
+                      //         onPressed: () => Navigator.pop(context),
+                      //       )
+                      //     ],
+                      //   ),
+                      // ),
+                    );
+                  },
+                );
+              },
               icon : Icon(Icons.search)
             )
           ],   
         ),
         drawer: Sidebar(parentContext: context),
         // body: Text("Product"),
-        body : ProductScreeen(context)
+        body : ProductScreeen(context),                            
       )
     );
   }
@@ -77,7 +188,7 @@ class ProductScreenState extends State<ProductScreeen>{
         }   
 
         return Padding(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.only(top: 10,right : 10,left: 10,bottom : 50),
           child: RefreshIndicator(
             onRefresh: () => Provider.of<ProductProvider>(context,listen : false).onLoad(),
             child: Consumer<ProductProvider>(
