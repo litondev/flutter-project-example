@@ -15,6 +15,7 @@ class UserProvider extends ChangeNotifier{
       photo:  user["photo"]
     );
 
+    print(user);
     notifyListeners();
   }
 

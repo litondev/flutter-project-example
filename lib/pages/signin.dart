@@ -271,8 +271,16 @@ class SigninScreenState extends State<SigninScreen>{
           await prefs.setString('token', 'Bearer '+responseBody["access_token"]);
           // await prefs.setString('user',json.encode(responseBody["user"]));
           
-          Provider.of<UserProvider>(context,listen: false).setIsLogin(true);        
+          Provider.of<UserProvider>(context,listen: false).setUser(<String,dynamic>{
+            "id" : responseBody["user"]["id"],
+            "name" : responseBody["user"]["name"],
+            "email" : responseBody["user"]["email"],
+            "photo" : responseBody["user"]["photo"]
+          });
+
+          Provider.of<UserProvider>(context,listen: false).setIsLogin(true);                  
         }else{
+
           print(response.statusCode);
           
           Fluttertoast.showToast(
