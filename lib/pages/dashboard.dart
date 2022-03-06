@@ -87,9 +87,9 @@ class _DashboardScreen extends State<DashboardScreen>{
 
   _scrollHorizontal(){
     var triggerFetchMoreSize =
-        0.9 * _scrollControllerVertical.position.maxScrollExtent;
+        0.9 * _scrollControllerHorizontal.position.maxScrollExtent;
 
-    if (_scrollControllerVertical.position.pixels >
+    if (_scrollControllerHorizontal.position.pixels >
         triggerFetchMoreSize) {          
           setState(() {
             isLoadingHorizontal = true;
@@ -336,27 +336,30 @@ class _DashboardScreen extends State<DashboardScreen>{
       }
 
       return ListView.builder(
-          // shrinkWrap: true,
+          shrinkWrap: true,
           controller: _scrollControllerHorizontal,
           itemCount : itemsHorizontal.length,
           scrollDirection: Axis.horizontal,
           itemBuilder :(ctx,i){
-            return Card(
-              elevation: 2.5,
-              child:  ListTile(
-                leading: CircleAvatar(
-                  child : Text(itemsHorizontal[i].title as String),
-                ),
-                title : Text(itemsHorizontal[i].title as String),
-                  subtitle: Text(
-                  itemsHorizontal[i].description ?? '-',
-                    style: TextStyle(
-                      color:Colors.grey,
-                      fontSize: 12
+            return Container(         
+              width: 300,
+              child : Card(
+                elevation: 2.5,
+                child:  ListTile(
+                  leading: CircleAvatar(
+                    child : Text(itemsHorizontal[i].title as String),
+                  ),
+                  title : Text(itemsHorizontal[i].title as String),
+                    subtitle: Text(
+                    itemsHorizontal[i].description ?? '-',
+                      style: TextStyle(
+                        color:Colors.grey,
+                        fontSize: 12
+                        )
                       )
-                    )
+                  )
                 )
-              );
+            );
         });
     }
 
@@ -381,6 +384,7 @@ class _DashboardScreen extends State<DashboardScreen>{
       }
 
       return ListView.builder(
+          shrinkWrap: true,
           controller: _scrollControllerVertical,
           itemCount : itemsVertical.length,
           itemBuilder :(ctx,i){
@@ -403,50 +407,26 @@ class _DashboardScreen extends State<DashboardScreen>{
         });
     }
 
-      return Container(
-          margin: const EdgeInsets.symmetric(vertical: 20.0),
-          height: 200.0,
-          child: ListView.builder(
-            itemCount : itemsHorizontal.length,
-            // This next line does the trick.
-            scrollDirection: Axis.horizontal,
-            itemBuilder :(ctx,i){
-              return Card(
-                elevation: 2.5,
-                child:  ListTile(
-                  leading: CircleAvatar(
-                    child : Text(itemsHorizontal[i].title as String),
-                  ),
-                  title : Text(itemsHorizontal[i].title as String),
-                    subtitle: Text(
-                    itemsHorizontal[i].description ?? '-',
-                      style: TextStyle(
-                        color:Colors.grey,
-                        fontSize: 12
-                        )
-                      )
-                  )
-                );
-              })                    
-        );
-
-    // return  Container(
-    //   child : Column(
+    // return Column(
+    //   // mainAxisSize: MainAxisSize.min,
     //   children: <Widget>[
-    //   Expanded(
-    //    child : ListView.builder(
-    //       // shrinkWrap: true,
+    //   Expanded(        
+    //     child: ListView.builder(
     //       controller: _scrollControllerHorizontal,
-    //       itemCount : itemsHorizontal.length,
+    //       shrinkWrap: true,
     //       scrollDirection: Axis.horizontal,
-    //       itemBuilder :(ctx,i){
-    //         return Card(
-    //           elevation: 2.5,
-    //           child:  ListTile(
-    //             leading: CircleAvatar(
-    //               child : Text(itemsHorizontal[i].title as String),
-    //             ),
-    //             title : Text(itemsHorizontal[i].title as String),
+    //       itemCount : itemsHorizontal.length,
+    //       itemBuilder: (_, i) {
+    //           return Container(
+    //             width : 100,
+    //             height: 50,
+    //             child :Card(              
+    //             elevation: 2.5,
+    //             child:  ListTile(
+    //               leading: CircleAvatar(
+    //                 child : Text(itemsHorizontal[i].title as String),
+    //                 ),
+    //               title : Text(itemsHorizontal[i].title as String),
     //               subtitle: Text(
     //               itemsHorizontal[i].description ?? '-',
     //                 style: TextStyle(
@@ -455,24 +435,23 @@ class _DashboardScreen extends State<DashboardScreen>{
     //                   )
     //                 )
     //             )
-    //           );
-    //     })      
-    //  )]));
-
-    // return Column(
-    //   children: [
-    //     Expanded(
-    //       child : SizedBox(
-    //         height: 100.0,
-    //         child : generateHorizontal()
-    //       )
+    //           ));
+    //       }),
     //     ),
-    //     Container( 
-    //       // height : MediaQuery.of(context).size.height,    
-    //       height : 400,
-    //       child : generateVertical()
-    //     )
     //   ],
     // );
+
+    return Column(
+      children: [        
+        Expanded(
+            flex: 1,
+            child : generateHorizontal()            
+        ),    
+        Expanded( 
+          flex : 3,
+          child : generateVertical()          
+        )
+      ],
+    );
   }
 }
